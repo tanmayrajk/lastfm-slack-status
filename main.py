@@ -3,6 +3,7 @@ import json
 from dotenv import load_dotenv
 import os
 import time
+import atexit
 
 load_dotenv()
 
@@ -52,12 +53,20 @@ def get_latest_track(username, api_key):
     else:
         print("Failed to retrieve tracks.")
 
-while True:
-    time.sleep(10)
-    song = get_latest_track(LASTFM_USERNAME, LASTFM_KEY)
+def on_exit():
+    set_slack_status(status_text="", status_emoji="", status_expiration=0, slack_token=SLACK_TOKEN)
 
-    if (song["now_playing"] == True):
-        text = f"{song["artist"]} - {song["name"]}"
-        set_slack_status(status_text=text, status_emoji=STATUS_EMOJI, status_expiration=0, slack_token=SLACK_TOKEN)
-    else:
-        set_slack_status(status_text="", status_emoji="", status_expiration=0, slack_token=SLACK_TOKEN)
+atexit.register(on_exit)
+
+while True:
+    try:
+        time.sleep(10)
+        song = get_latest_track(LASTFM_USERNAME, LASTFM_KEY)
+
+        if (song["now_playing"] == True):
+            text = f"{song["artist"]} - {song["name"]}"
+            set_slack_status(status_text=text, status_emoji=STATUS_EMOJI, status_expiration=0, slack_token=SLACK_TOKEN)
+        else:
+            set_slack_status(status_text="", status_emoji="", status_expiration=0, slack_token=SLACK_TOKEN)
+    except KeyboardInterrupt:
+        break
