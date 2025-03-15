@@ -8,6 +8,7 @@ import atexit
 load_dotenv()
 
 SLACK_TOKEN = os.getenv("SLACK_TOKEN")
+SLACK_EMOJI_TOKEN = os.getenv("SLACK_EMOJI_TOKEN")
 LASTFM_KEY = os.getenv("LASTFM_KEY")
 LASTFM_USERNAME = os.getenv("LASTFM_USERNAME")
 STATUS_EMOJI = os.getenv("STATUS_EMOJI")
@@ -60,13 +61,12 @@ atexit.register(on_exit)
 
 while True:
     try:
-        time.sleep(10)
         song = get_latest_track(LASTFM_USERNAME, LASTFM_KEY)
-
         if (song["now_playing"] == True):
             text = f"{song["artist"]} - {song["name"]}"
             set_slack_status(status_text=text, status_emoji=STATUS_EMOJI, status_expiration=0, slack_token=SLACK_TOKEN)
         else:
             set_slack_status(status_text="", status_emoji="", status_expiration=0, slack_token=SLACK_TOKEN)
+        time.sleep(10)
     except KeyboardInterrupt:
         break
