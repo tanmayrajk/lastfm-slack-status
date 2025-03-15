@@ -13,6 +13,8 @@ LASTFM_KEY = os.getenv("LASTFM_KEY")
 LASTFM_USERNAME = os.getenv("LASTFM_USERNAME")
 STATUS_EMOJI = os.getenv("STATUS_EMOJI")
 
+last_song_text = ""
+
 def set_slack_status(status_text, status_emoji, status_expiration, slack_token):
     url = "https://slack.com/api/users.profile.set"
     headers = {
@@ -64,9 +66,25 @@ while True:
         song = get_latest_track(LASTFM_USERNAME, LASTFM_KEY)
         if (song["now_playing"] == True):
             text = f"{song["artist"]} - {song["name"]}"
+            if last_song_text == text:
+                print("Song already updated. Skipping...")
+                time.sleep(10)
+                continue
+            last_song_text = text
+            print(f"Setting status as '{text}'...")
             set_slack_status(status_text=text, status_emoji=STATUS_EMOJI, status_expiration=0, slack_token=SLACK_TOKEN)
+            print("Status updated!")
         else:
+            if last_song_text == "":
+                print("No song currently playing. Retrying in 10 seconds...")
+                time.sleep(10)
+                continue
+            last_song_text = ""
+            print("Removing status...")
             set_slack_status(status_text="", status_emoji="", status_expiration=0, slack_token=SLACK_TOKEN)
-        time.sleep(10)
+            print("Status updated!")
+    except requests.exceptions.RequestException as e:
+        print(f"Network error: {e}. Retrying in 10 seconds...")
     except KeyboardInterrupt:
         break
+    time.sleep(10)
