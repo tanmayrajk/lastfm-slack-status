@@ -1,5 +1,9 @@
 # lastfm slack status
 
+## screenshot
+
+![screenshot](image.png)
+
 ## usage
 
 - install the dependencies
