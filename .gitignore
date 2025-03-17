@@ -1,6 +1,7 @@
 Scripts/
 Lib/
 Include/
+share/
 __pycache__/
 pyvenv.cfg
 *.pyc
