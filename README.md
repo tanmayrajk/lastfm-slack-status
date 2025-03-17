@@ -2,7 +2,7 @@
 
 ## screenshot
 
-![screenshot](image.png)
+![demo](demo.gif)
 
 ## usage
 
